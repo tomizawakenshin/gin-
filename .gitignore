@@ -1,0 +1,7 @@
+# .envファイルを無視
+.env
+
+# .env.testファイルを無視
+.env.test
+
+/docker
