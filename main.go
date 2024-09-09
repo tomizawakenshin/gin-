@@ -23,11 +23,16 @@ func setupRouter(db *gorm.DB) *gin.Engine {
 	authService := services.NewAuthService(authRepository)
 	authController := controller.NewAuthController(authService)
 
+	hanabiRepository := reposotories.NewHanabiRepository(db)
+	hanabiService := services.NewHanabiService(hanabiRepository)
+	hanabiController := controller.NewHanabiController(hanabiService)
+
 	r := gin.Default()
 	r.Use(cors.Default())
+
+	//itemのエンドポイント
 	itemRouter := r.Group("/items")
 	itemRouterWithAuth := r.Group("/items", middlewares.AuthMiddleware(authService))
-	authRouter := r.Group("/auth")
 
 	itemRouter.GET("", itemController.FindAll)
 	itemRouterWithAuth.GET("/:id", itemController.FindById)
@@ -36,6 +41,13 @@ func setupRouter(db *gorm.DB) *gin.Engine {
 	itemRouterWithAuth.PUT("/:id", itemController.Update)
 	itemRouterWithAuth.DELETE("/:id", itemController.Delete)
 
+	//hanabiのエンドポイント
+	//hanabiRouter := r.Group("/hanabi")
+	hanabiRouterWithAuth := r.Group("/hanabi", middlewares.AuthMiddleware(authService))
+	hanabiRouterWithAuth.POST("/create", hanabiController.Create)
+
+	//user認証関連のエンドポイント
+	authRouter := r.Group("/auth")
 	authRouter.POST("/signup", authController.SignUp)
 	authRouter.POST("/login", authController.Login)
 
