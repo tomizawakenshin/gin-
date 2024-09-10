@@ -34,7 +34,7 @@ func (r *HanabiRepository) FindAll() (*[]models.Hanabi, error) {
 
 func (r *HanabiRepository) FindByID(hanabiID uint) (*models.Hanabi, error) {
 	var hanabi models.Hanabi
-	result := r.db.Preload("User").First(&hanabi, "id = ?", hanabiID)
+	result := r.db.Preload("User").Preload("User.Hanabis.User", nil).First(&hanabi, "id = ?", hanabiID)
 	if result.Error != nil {
 		if result.Error.Error() == "record not found" {
 			return nil, errors.New("hanabi not found")
