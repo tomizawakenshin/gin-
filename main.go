@@ -45,6 +45,7 @@ func setupRouter(db *gorm.DB) *gin.Engine {
 	//hanabiRouter := r.Group("/hanabi")
 	hanabiRouterWithAuth := r.Group("/hanabi", middlewares.AuthMiddleware(authService))
 	hanabiRouterWithAuth.POST("/create", hanabiController.Create)
+	hanabiRouterWithAuth.GET("/getAll", hanabiController.FindAll)
 
 	//user認証関連のエンドポイント
 	authRouter := r.Group("/auth")
