@@ -12,10 +12,10 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/google/uuid"
-
 	"cloud.google.com/go/storage"
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
+	"google.golang.org/api/option"
 )
 
 type IHanabiController interface {
@@ -93,22 +93,33 @@ func (c *HanabiController) Create(ctx *gin.Context) {
 // Google Cloud Storage にファイルをアップロードする関数
 func uploadFileToGCS(bucketName, objectName string, file multipart.File) (string, error) {
 	ctx := context.Background()
-	client, err := storage.NewClient(ctx)
+	fmt.Println("関数の中には入ってる")
+
+	// 認証情報のJSONファイルのパス
+	credentialsFile := "/Users/冨澤 健心/Documents/secret-key/team17_sokuseki/atomic-life-435113-t3-49a446fb681d.json" // ここにダウンロードしたJSONファイルのパスを指定
+
+	// 認証情報を使用してクライアントを作成
+	client, err := storage.NewClient(ctx, option.WithCredentialsFile(credentialsFile))
 	if err != nil {
+		fmt.Println("クライアントが作成できません")
 		return "", err
 	}
 	defer client.Close()
 
+	fmt.Println("クライアントは作成できました")
 	ctx, cancel := context.WithTimeout(ctx, time.Second*50)
 	defer cancel()
 
 	// バケットを指定してファイルをアップロード
 	bucket := client.Bucket(bucketName)
 	wc := bucket.Object(objectName).NewWriter(ctx)
+	fmt.Println("ファイルのアップロード開始")
 	if _, err = io.Copy(wc, file); err != nil {
+		fmt.Println("コピー失敗")
 		return "", err
 	}
 	if err := wc.Close(); err != nil {
+		fmt.Println("クローズ失敗")
 		return "", err
 	}
 
