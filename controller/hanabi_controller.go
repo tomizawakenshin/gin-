@@ -127,7 +127,7 @@ func (c *HanabiController) Create(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusCreated, gin.H{"data": newHanabi})
+	ctx.JSON(http.StatusCreated, gin.H{"AllHanabi": newHanabi})
 }
 
 // Google Cloud Storage にファイルをアップロードする関数
