@@ -25,11 +25,24 @@ func NewHanabiRepository(db *gorm.DB) IHanabiRepository {
 
 func (r *HanabiRepository) FindAll() (*[]models.Hanabi, error) {
 	var hanabis []models.Hanabi
-	// created_at カラムで降順に並べ替える
+
+	// Hanabiをcreated_atで降順に並べ替え
+	//result := r.db.Preload("User").Order("created_at DESC").Find(&hanabis)
 	result := r.db.Order("created_at DESC").Find(&hanabis)
 	if result.Error != nil {
 		return nil, result.Error
 	}
+
+	// 各Hanabiに対してCommentCountを計算
+	for i := range hanabis {
+		var commentCount int64
+		result = r.db.Model(&models.Comment{}).Where("hanabi_id = ?", hanabis[i].ID).Count(&commentCount)
+		if result.Error != nil {
+			return nil, errors.New("コメント数の取得に失敗しました")
+		}
+		hanabis[i].CommentCount = uint(commentCount)
+	}
+
 	return &hanabis, nil
 }
 
