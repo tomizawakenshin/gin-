@@ -10,6 +10,7 @@ import (
 	"log"
 	"mime/multipart"
 	"net/http"
+	"strconv"
 	"time"
 
 	"cloud.google.com/go/storage"
@@ -20,6 +21,7 @@ import (
 
 type IHanabiController interface {
 	FindAll(ctx *gin.Context)
+	FindByID(ctx *gin.Context)
 	Create(ctx *gin.Context)
 }
 
@@ -40,6 +42,33 @@ func (c *HanabiController) FindAll(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusOK, gin.H{"data": hanabis})
+}
+
+func (c *HanabiController) FindByID(ctx *gin.Context) {
+	_, exists := ctx.Get("user")
+	if !exists {
+		ctx.AbortWithStatus(http.StatusUnauthorized)
+		return
+	}
+
+	//userId := user.(*models.User).ID
+	itemId, err := strconv.ParseUint(ctx.Param("id"), 10, 64)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid id "})
+		return
+	}
+
+	foundedItem, err := c.services.FindByID(uint(itemId))
+	if err != nil {
+		if err.Error() == "hanabis not found" {
+			ctx.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+			return
+		}
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Unexpected error"})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{"founded hanabi": foundedItem})
 }
 
 func (c *HanabiController) Create(ctx *gin.Context) {
