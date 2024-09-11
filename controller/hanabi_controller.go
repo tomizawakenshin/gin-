@@ -68,7 +68,7 @@ func (c *HanabiController) FindByID(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusOK, gin.H{"founded item": foundedItem})
+	ctx.JSON(http.StatusOK, gin.H{"founded hanabi": foundedItem})
 }
 
 func (c *HanabiController) Create(ctx *gin.Context) {

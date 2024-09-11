@@ -12,6 +12,7 @@ type IHanabiRepository interface {
 	FindByID(hanabiID uint) (*models.Hanabi, error)
 	Create(newItem models.Hanabi) (*models.Hanabi, error)
 	PreloadUser(hanabi *models.Hanabi) error
+	IncrementCommentCount(hanabiId uint) error
 }
 
 type HanabiRepository struct {
@@ -34,14 +35,31 @@ func (r *HanabiRepository) FindAll() (*[]models.Hanabi, error) {
 
 func (r *HanabiRepository) FindByID(hanabiID uint) (*models.Hanabi, error) {
 	var hanabi models.Hanabi
-	result := r.db.Preload("User").First(&hanabi, "id = ?", hanabiID)
+	result := r.db.Preload("User").
+		Preload("Comments").
+		Preload("Comments.User").
+		First(&hanabi, "id = ?", hanabiID)
+
 	if result.Error != nil {
 		if result.Error.Error() == "record not found" {
 			return nil, errors.New("hanabi not found")
 		}
 		return nil, result.Error
 	}
+
+	var commentCount int64
+	result = r.db.Model(&models.Comment{}).Where("hanabi_id = ?", hanabiID).Count(&commentCount)
+	if result.Error != nil {
+		return nil, errors.New("指定されたhanabiのコメントが取得できませんでした")
+	}
+	hanabi.CommentCount = uint(commentCount)
+
 	return &hanabi, nil
+}
+
+// ここに IncrementCommentCount 関数を追加します
+func (r *HanabiRepository) IncrementCommentCount(hanabiId uint) error {
+	return r.db.Model(&models.Hanabi{}).Where("id = ?", hanabiId).Update("comment_count", gorm.Expr("comment_count + ?", 1)).Error
 }
 
 func (r *HanabiRepository) Create(newItem models.Hanabi) (*models.Hanabi, error) {

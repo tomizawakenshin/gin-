@@ -28,7 +28,7 @@ func setupRouter(db *gorm.DB) *gin.Engine {
 	hanabiController := controller.NewHanabiController(hanabiService)
 
 	commentRepository := reposotories.NewCommentMemoryRepository(db)
-	commentService := services.NewCommentService(commentRepository)
+	commentService := services.NewCommentService(commentRepository, hanabiRepository)
 	commentController := controller.NewCommentController(commentService)
 
 	r := gin.Default()
