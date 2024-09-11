@@ -12,7 +12,6 @@ type IHanabiRepository interface {
 	FindByID(hanabiID uint) (*models.Hanabi, error)
 	Create(newItem models.Hanabi) (*models.Hanabi, error)
 	PreloadUser(hanabi *models.Hanabi) error
-	IncrementCommentCount(hanabiId uint) error
 }
 
 type HanabiRepository struct {
@@ -68,11 +67,6 @@ func (r *HanabiRepository) FindByID(hanabiID uint) (*models.Hanabi, error) {
 	hanabi.CommentCount = uint(commentCount)
 
 	return &hanabi, nil
-}
-
-// ここに IncrementCommentCount 関数を追加します
-func (r *HanabiRepository) IncrementCommentCount(hanabiId uint) error {
-	return r.db.Model(&models.Hanabi{}).Where("id = ?", hanabiId).Update("comment_count", gorm.Expr("comment_count + ?", 1)).Error
 }
 
 func (r *HanabiRepository) Create(newItem models.Hanabi) (*models.Hanabi, error) {
