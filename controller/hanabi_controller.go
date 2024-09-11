@@ -41,7 +41,7 @@ func (c *HanabiController) FindAll(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusOK, gin.H{"data": hanabis})
+	ctx.JSON(http.StatusOK, gin.H{"AllHanabis": hanabis})
 }
 
 func (c *HanabiController) FindByID(ctx *gin.Context) {
