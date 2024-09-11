@@ -26,7 +26,7 @@ func NewHanabiRepository(db *gorm.DB) IHanabiRepository {
 func (r *HanabiRepository) FindAll() (*[]models.Hanabi, error) {
 	var hanabis []models.Hanabi
 	// created_at カラムで降順に並べ替える
-	result := r.db.Preload("User").Order("created_at DESC").Find(&hanabis)
+	result := r.db.Order("created_at DESC").Find(&hanabis)
 	if result.Error != nil {
 		return nil, result.Error
 	}
