@@ -7,7 +7,7 @@ import (
 )
 
 type IHanabiService interface {
-	FindAll() (*[]models.Hanabi, error)
+	FindAll(date string) (*[]models.Hanabi, error)
 	FindByID(hanabiID uint, userID uint) (*models.Hanabi, error)
 	Create(createInputment dto.CreateHanabiInput, userId uint) (*models.Hanabi, error)
 	PreloadUser(hanabi *models.Hanabi) error
@@ -21,10 +21,9 @@ func NewHanabiService(repository reposotories.IHanabiRepository) IHanabiService 
 	return &HanabiService{repository: repository}
 }
 
-func (s *HanabiService) FindAll() (*[]models.Hanabi, error) {
-	return s.repository.FindAll()
+func (s *HanabiService) FindAll(date string) (*[]models.Hanabi, error) {
+	return s.repository.FindAll(date)
 }
-
 func (s *HanabiService) FindByID(itemID uint, userID uint) (*models.Hanabi, error) {
 	return s.repository.FindByID(itemID, userID)
 }

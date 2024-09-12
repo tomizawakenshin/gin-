@@ -8,7 +8,7 @@ import (
 )
 
 type IHanabiRepository interface {
-	FindAll() (*[]models.Hanabi, error)
+	FindAll(date string) (*[]models.Hanabi, error)
 	FindByID(hanabiID uint, userID uint) (*models.Hanabi, error)
 	Create(newItem models.Hanabi) (*models.Hanabi, error)
 	PreloadUser(hanabi *models.Hanabi) error
@@ -22,12 +22,20 @@ func NewHanabiRepository(db *gorm.DB) IHanabiRepository {
 	return &HanabiRepository{db: db}
 }
 
-func (r *HanabiRepository) FindAll() (*[]models.Hanabi, error) {
+func (r *HanabiRepository) FindAll(date string) (*[]models.Hanabi, error) {
 	var hanabis []models.Hanabi
 
-	// Hanabiをcreated_atで降順に並べ替え
-	//result := r.db.Preload("User").Order("created_at DESC").Find(&hanabis)
-	result := r.db.Order("created_at DESC").Find(&hanabis)
+	// クエリの初期化
+	query := r.db.Order("created_at DESC")
+
+	// 日付フィルタリングを追加
+	if date != "" {
+		// 指定された日付でフィルタリング（例: "2024-09-01"）
+		query = query.Where("DATE(created_at) = ?", date)
+	}
+
+	// Hanabiのデータを取得
+	result := query.Find(&hanabis)
 	if result.Error != nil {
 		return nil, result.Error
 	}

@@ -34,13 +34,13 @@ func NewHanabiController(service services.IHanabiService) IHanabiController {
 }
 
 func (c *HanabiController) FindAll(ctx *gin.Context) {
-	hanabis, err := c.services.FindAll()
+	date := ctx.Query("date")
 
+	hanabis, err := c.services.FindAll(date)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Unexpected error "})
 		return
 	}
-
 
 	ctx.JSON(http.StatusOK, gin.H{"All Hanabis": hanabis})
 
