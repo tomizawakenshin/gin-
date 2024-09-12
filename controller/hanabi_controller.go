@@ -41,7 +41,9 @@ func (c *HanabiController) FindAll(ctx *gin.Context) {
 		return
 	}
 
+
 	ctx.JSON(http.StatusOK, gin.H{"All Hanabis": hanabis})
+
 }
 
 func (c *HanabiController) FindByID(ctx *gin.Context) {
@@ -127,7 +129,7 @@ func (c *HanabiController) Create(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusCreated, gin.H{"data": newHanabi})
+	ctx.JSON(http.StatusCreated, gin.H{"AllHanabi": newHanabi})
 }
 
 // Google Cloud Storage にファイルをアップロードする関数
