@@ -4,8 +4,8 @@ import (
 	"gin-fleamarket/controller"
 	"gin-fleamarket/infra"
 	"gin-fleamarket/middlewares"
+	"time"
 
-	// "gin-fleamarket/models"
 	"gin-fleamarket/reposotories"
 	"gin-fleamarket/services"
 
@@ -15,9 +15,6 @@ import (
 )
 
 func setupRouter(db *gorm.DB) *gin.Engine {
-	itemRepository := reposotories.NewItemMemoryRepository(db)
-	itemService := services.NewItemService(itemRepository)
-	itemController := controller.NewItemController(itemService)
 
 	authRepository := reposotories.NewAuthRepository(db)
 	authService := services.NewAuthService(authRepository)
@@ -31,19 +28,21 @@ func setupRouter(db *gorm.DB) *gin.Engine {
 	commentService := services.NewCommentService(commentRepository, hanabiRepository)
 	commentController := controller.NewCommentController(commentService)
 
+	likeRepository := reposotories.NewLikeRepository(db)
+	likeService := services.NewLikeService(likeRepository)
+	likeController := controller.NewLikeController(likeService)
+
 	r := gin.Default()
-	r.Use(cors.Default())
-
-	//itemのエンドポイント
-	itemRouter := r.Group("/items")
-	itemRouterWithAuth := r.Group("/items", middlewares.AuthMiddleware(authService))
-
-	itemRouter.GET("", itemController.FindAll)
-	itemRouterWithAuth.GET("/:id", itemController.FindById)
-	itemRouterWithAuth.POST("", itemController.Create)
-	itemRouter.POST("/restore/:id", itemController.Restore)
-	itemRouterWithAuth.PUT("/:id", itemController.Update)
-	itemRouterWithAuth.DELETE("/:id", itemController.Delete)
+	// r.Use(cors.Default())
+	// CORS 設定
+	r.Use(cors.New(cors.Config{
+		AllowOrigins:     []string{"https://your-frontend.vercel.app"},        // フロントエンドのVercelドメインを許可
+		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"}, // 許可するHTTPメソッド
+		AllowHeaders:     []string{"Origin", "Content-Type", "Authorization"}, // 許可するリクエストヘッダー
+		ExposeHeaders:    []string{"Content-Length"},                          // クライアントに公開するレスポンスヘッダー
+		AllowCredentials: true,                                                // 認証情報（クッキーなど）の送信を許可
+		MaxAge:           12 * time.Hour,                                      // プリフライトリクエストのキャッシュ時間
+	}))
 
 	//hanabiのエンドポイント
 	//hanabiRouter := r.Group("/hanabi")
@@ -55,6 +54,11 @@ func setupRouter(db *gorm.DB) *gin.Engine {
 	//commentのエンドポイント
 	commentRouterWithAuth := r.Group("/comment", middlewares.AuthMiddleware(authService))
 	commentRouterWithAuth.POST("/create/:hanabiId", commentController.Create)
+
+	//likeのエンドポイント
+	likeRouterWithAuth := r.Group("/like", middlewares.AuthMiddleware(authService))
+	likeRouterWithAuth.POST("/like/:commentId", likeController.Like)
+	likeRouterWithAuth.DELETE("/unlike/:commentId", likeController.Unlike)
 
 	//user認証関連のエンドポイント
 	authRouter := r.Group("/auth")

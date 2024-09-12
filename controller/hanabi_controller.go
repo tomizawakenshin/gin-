@@ -41,24 +41,26 @@ func (c *HanabiController) FindAll(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusOK, gin.H{"AllHanabis": hanabis})
+
+	ctx.JSON(http.StatusOK, gin.H{"All Hanabis": hanabis})
+
 }
 
 func (c *HanabiController) FindByID(ctx *gin.Context) {
-	_, exists := ctx.Get("user")
+	user, exists := ctx.Get("user")
 	if !exists {
 		ctx.AbortWithStatus(http.StatusUnauthorized)
 		return
 	}
 
-	//userId := user.(*models.User).ID
-	itemId, err := strconv.ParseUint(ctx.Param("id"), 10, 64)
+	userId := user.(*models.User).ID
+	hanabiId, err := strconv.ParseUint(ctx.Param("id"), 10, 64)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid id "})
 		return
 	}
 
-	foundedItem, err := c.services.FindByID(uint(itemId))
+	foundedHanabi, err := c.services.FindByID(uint(hanabiId), uint(userId))
 	if err != nil {
 		if err.Error() == "hanabis not found" {
 			ctx.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
@@ -68,7 +70,7 @@ func (c *HanabiController) FindByID(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusOK, gin.H{"founded hanabi": foundedItem})
+	ctx.JSON(http.StatusOK, gin.H{"founded hanabi": foundedHanabi})
 }
 
 func (c *HanabiController) Create(ctx *gin.Context) {
