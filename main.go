@@ -36,12 +36,12 @@ func setupRouter(db *gorm.DB) *gin.Engine {
 	// r.Use(cors.Default())
 	// CORS 設定
 	r.Use(cors.New(cors.Config{
-		AllowOrigins:     []string{"https://your-frontend.vercel.app"},        // フロントエンドのVercelドメインを許可
-		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"}, // 許可するHTTPメソッド
-		AllowHeaders:     []string{"Origin", "Content-Type", "Authorization"}, // 許可するリクエストヘッダー
-		ExposeHeaders:    []string{"Content-Length"},                          // クライアントに公開するレスポンスヘッダー
-		AllowCredentials: true,                                                // 認証情報（クッキーなど）の送信を許可
-		MaxAge:           12 * time.Hour,                                      // プリフライトリクエストのキャッシュ時間
+		AllowOrigins:     []string{"http://localhost:3000", "https://your-frontend.vercel.app"}, // フロントエンドのドメインを許可
+		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},                   // 許可するHTTPメソッド
+		AllowHeaders:     []string{"Origin", "Content-Type", "Authorization"},                   // 許可するリクエストヘッダー
+		ExposeHeaders:    []string{"Content-Length"},                                            // クライアントに公開するレスポンスヘッダー
+		AllowCredentials: true,                                                                  // 認証情報（クッキーなど）の送信を許可
+		MaxAge:           12 * time.Hour,                                                        // プリフライトリクエストのキャッシュ時間
 	}))
 
 	//hanabiのエンドポイント
