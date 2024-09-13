@@ -42,7 +42,8 @@ func (c *HanabiController) FindAll(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusOK, gin.H{"All Hanabis": hanabis})
+	//ctx.JSON(http.StatusOK, gin.H{"All Hanabis": hanabis})
+	ctx.JSON(http.StatusOK, hanabis)
 
 }
 

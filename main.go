@@ -4,6 +4,7 @@ import (
 	"gin-fleamarket/controller"
 	"gin-fleamarket/infra"
 	"gin-fleamarket/middlewares"
+	"net/http"
 	"time"
 
 	"gin-fleamarket/reposotories"
@@ -43,6 +44,14 @@ func setupRouter(db *gorm.DB) *gin.Engine {
 		AllowCredentials: true,                                                                  // 認証情報（クッキーなど）の送信を許可
 		MaxAge:           12 * time.Hour,                                                        // プリフライトリクエストのキャッシュ時間
 	}))
+
+	r.OPTIONS("/hanabi/getAll", func(c *gin.Context) {
+		c.Header("Access-Control-Allow-Origin", "http://localhost:3000")
+		c.Header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
+		c.Header("Access-Control-Allow-Headers", "Origin, Content-Type, Authorization")
+		c.Header("Access-Control-Allow-Credentials", "true")
+		c.Status(http.StatusNoContent) // 204 No Contentを返す
+	})
 
 	//hanabiのエンドポイント
 	//hanabiRouter := r.Group("/hanabi")
