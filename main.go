@@ -42,7 +42,7 @@ func setupRouter(db *gorm.DB) *gin.Engine {
 		AllowHeaders:     []string{"Origin", "Content-Type", "Authorization"},                   // 許可するリクエストヘッダー
 		ExposeHeaders:    []string{"Content-Length"},                                            // クライアントに公開するレスポンスヘッダー
 		AllowCredentials: true,                                                                  // 認証情報（クッキーなど）の送信を許可
-		MaxAge:           12 * time.Hour,                                                        // プリフライトリクエストのキャッシュ時間
+		MaxAge:           48 * time.Hour,                                                        // プリフライトリクエストのキャッシュ時間
 	}))
 
 	r.OPTIONS("/hanabi/getAll", func(c *gin.Context) {
